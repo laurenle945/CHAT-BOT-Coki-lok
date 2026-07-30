@@ -1,0 +1,1058 @@
+# CHAT-BOT-Coki-lok
+Esta página web esta creado para reservar lugares 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coki Lok - Reserva de Salas de Eventos y Ventas Reales</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playball (manuscrita elegante) e Inter (lectura fluida) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playball&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-cursive {
+            font-family: 'Playball', cursive;
+        }
+        /* Scrollbar personalizado para el chat de servicio al cliente */
+        .chat-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-scrollbar::-webkit-scrollbar-track {
+            background: #f3e8ff;
+        }
+        .chat-scrollbar::-webkit-scrollbar-thumb {
+            background: #c084fc;
+            border-radius: 6px;
+        }
+        /* Animación de destellos decorativos */
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.03); opacity: 1; }
+        }
+        .premium-glow {
+            animation: pulse-soft 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-purple-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Header Principal -->
+    <header class="bg-purple-100 shadow-sm sticky top-0 z-40 border-b border-purple-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logotipo: Letras moradas oscuras, fondo morado claro en manuscrita -->
+            <div class="flex items-center space-x-2 bg-purple-200 px-5 py-2.5 rounded-full border border-purple-300 shadow-inner">
+                <span class="text-3xl sm:text-4xl font-cursive text-purple-950 tracking-wide select-none">coki lok</span>
+            </div>
+
+            <!-- Indicador de Servicio al Cliente Activo -->
+            <div class="flex items-center space-x-2 bg-green-100 border border-green-300 px-4 py-1.5 rounded-full">
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                </span>
+                <span class="text-xs font-bold text-green-800">Planificación de Eventos 24/7</span>
+            </div>
+
+            <!-- Botón de Cotizaciones de Salas -->
+            <button onclick="toggleCart()" class="relative p-2.5 text-purple-950 hover:bg-purple-200 rounded-full transition focus:outline-none animate-bounce" aria-label="Ver Cotizaciones">
+                <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-purple-800 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Layout Dual Principal -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- PANEL IZQUIERDO (5 Columnas): Planificador y Creador de Temáticas -->
+        <section class="lg:col-span-5 flex flex-col space-y-6">
+            
+            <!-- Creador de Temáticas "Coki Planner" -->
+            <div class="bg-white rounded-3xl p-6 shadow-xl border-2 border-purple-200 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-purple-900 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase">
+                    Coki Planner 🪄
+                </div>
+                <h3 class="text-xl font-extrabold text-purple-950 flex items-center space-x-2">
+                    <i data-lucide="palette" class="text-purple-800"></i>
+                    <span>Diseña tu Decoración</span>
+                </h3>
+                <p class="text-xs text-gray-500 mt-1 mb-4">Elige una temática decorativa y mira cómo se vería la iluminación real en tu sala seleccionada.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                    <!-- Vista previa en tiempo real de la sala con opción de zoom -->
+                    <div onclick="zoomCustomEvent()" class="md:col-span-5 flex flex-col items-center justify-center bg-purple-50/50 p-4 rounded-2xl border border-purple-100 min-h-[190px] cursor-zoom-in hover:bg-purple-100/60 transition group relative overflow-hidden">
+                        <div id="custom-event-preview" class="w-28 h-32 premium-glow flex flex-col items-center justify-center rounded-xl overflow-hidden">
+                            <!-- Imagen real de la sala con superposición de color temática -->
+                        </div>
+                        <span id="custom-event-title" class="text-[10px] font-bold bg-white px-2 py-0.5 rounded border border-purple-200 shadow-sm mt-2 max-w-full text-center text-purple-950">Temática Seleccionada</span>
+                        <div class="absolute inset-0 bg-black/10 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                            <span class="bg-white/95 text-purple-950 text-[10px] font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1">
+                                <i data-lucide="zoom-in" class="w-3 h-3"></i> Pantalla Completa
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Controles de Diseño Temático -->
+                    <div class="md:col-span-7 space-y-3">
+                        <!-- Selección de Sala Base -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase">1. Selecciona la Sala Real</label>
+                            <select id="event-room-select" onchange="updateCustomEvent()" class="w-full mt-1 p-2 border border-purple-200 rounded-xl text-xs focus:ring-1 focus:ring-purple-600 bg-purple-50/30">
+                                <option value="v1" selected>Sala Jardín Místico 🌳</option>
+                                <option value="v4">Sala Palacio Imperial 🏰</option>
+                                <option value="v2">Sala de Ventas Boutique 🛍️</option>
+                            </select>
+                        </div>
+
+                        <!-- Paleta de Colores de Iluminación -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase">2. Estilo de Luces & Ambientación</label>
+                            <select id="event-theme-select" onchange="updateCustomEvent()" class="w-full mt-1 p-2 border border-purple-200 rounded-xl text-xs focus:ring-1 focus:ring-purple-600 bg-purple-50/30">
+                                <option value="hadas" data-overlay="rgba(34, 197, 94, 0.15)" selected>Hadas del Bosque ✨ (Luces Verdes)</option>
+                                <option value="estrellas" data-overlay="rgba(59, 130, 246, 0.15)">Noche de Estrellas 🌌 (Luces Azules)</option>
+                                <option value="rosa" data-overlay="rgba(236, 72, 153, 0.15)">Rosa Chic 🌸 (Luces Rosadas)</option>
+                                <option value="neon" data-overlay="rgba(168, 85, 247, 0.15)">Neón Eléctrico ⚡ (Luces Moradas)</option>
+                            </select>
+                        </div>
+
+                        <!-- Nombre de la Celebrada/Evento -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase">3. Nombre del Cartel de Bienvenida</label>
+                            <input type="text" id="event-welcome-text" oninput="updateCustomEvent()" value="Mis Dulces 15" maxlength="20" class="w-full mt-1 p-2 border border-purple-200 rounded-xl text-xs focus:ring-1 focus:ring-purple-600">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de Añadir a la Cotización -->
+                <button onclick="addCustomEventToCart()" class="w-full mt-4 bg-purple-900 hover:bg-purple-800 text-white font-bold py-2.5 rounded-full text-xs shadow-md transition flex items-center justify-center space-x-2">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span id="event-price-btn">Agregar Diseño a mi Cotización</span>
+                </button>
+            </div>
+
+            <!-- Atajos de Búsqueda Rápida -->
+            <div class="bg-white rounded-3xl p-6 shadow-md border border-purple-100 flex flex-col space-y-3">
+                <h3 class="font-extrabold text-purple-950 text-sm uppercase tracking-wider flex items-center space-x-2">
+                    <i data-lucide="help-circle" class="w-4 h-4 text-purple-800"></i>
+                    <span>Preguntas frecuentes del chat:</span>
+                </h3>
+                <p class="text-xs text-gray-500 font-medium">Toca cualquiera de estos botones para solicitar información y fotos nítidas al instante:</p>
+                <div class="grid grid-cols-1 gap-2">
+                    <button onclick="sendQuickQuery('Ver todas las salas de eventos')" class="text-left text-xs bg-purple-50 hover:bg-purple-100 text-purple-950 p-3 rounded-2xl transition border border-purple-200 font-semibold flex items-center justify-between group">
+                        <span class="flex items-center space-x-2">
+                            <span>🏰</span>
+                            <span>Mostrar catálogo completo de salas</span>
+                        </span>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-purple-400 group-hover:text-purple-800 transition"></i>
+                    </button>
+                    <button onclick="sendQuickQuery('¿Cuál es la sala con mayor capacidad de personas?')" class="text-left text-xs bg-purple-50 hover:bg-purple-100 text-purple-950 p-3 rounded-2xl transition border border-purple-200 font-semibold flex items-center justify-between group">
+                        <span class="flex items-center space-x-2">
+                            <span>👥</span>
+                            <span>Salas para fiestas muy grandes (Masivas)</span>
+                        </span>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-purple-400 group-hover:text-purple-800 transition"></i>
+                    </button>
+                    <button onclick="sendQuickQuery('Quiero información de la sala de ventas')" class="text-left text-xs bg-purple-50 hover:bg-purple-100 text-purple-950 p-3 rounded-2xl transition border border-purple-200 font-semibold flex items-center justify-between group">
+                        <span class="flex items-center space-x-2">
+                            <span>🛍️</span>
+                            <span>Sala de Ventas y Exposiciones Boutique</span>
+                        </span>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-purple-400 group-hover:text-purple-800 transition"></i>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PANEL DERECHO (7 Columnas): Chatbot de Atención al Cliente de Coki Lok -->
+        <section class="lg:col-span-7 flex flex-col bg-white rounded-3xl shadow-xl border border-purple-200/60 overflow-hidden min-h-[550px]">
+            
+            <!-- Encabezado del Chatbot -->
+            <div class="bg-purple-900 text-white p-4 sm:p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-900 border-2 border-purple-300 relative shrink-0">
+                        <span class="font-cursive text-2xl font-bold select-none">cl</span>
+                        <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base leading-tight">Servicio al Cliente Coki Lok</h3>
+                        <p class="text-xs text-purple-200 flex items-center">
+                            <span class="w-1.5 h-1.5 bg-green-400 rounded-full inline-block mr-1 animate-pulse"></span>
+                            Asesora de Salas Reales de Eventos
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Botón de ajustes de API de Gemini -->
+                <button onclick="toggleApiSettings()" class="p-2 hover:bg-purple-800 rounded-full transition text-purple-200 hover:text-white" title="Configurar Inteligencia Artificial">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Panel Opcional de API Key de Gemini -->
+            <div id="api-settings-panel" class="hidden bg-purple-50 p-4 border-b border-purple-200 text-xs">
+                <p class="font-bold text-purple-950 mb-1">Activar Inteligencia Artificial Gemini (Opcional)</p>
+                <p class="text-gray-600 mb-2">Introduce tu API Key para habilitar respuestas personalizadas avanzadas. Si dejas esto vacío, se usará el motor inteligente local con carga de salas instantáneas de inmediato.</p>
+                <div class="flex space-x-2">
+                    <input type="password" id="api-key-input" placeholder="AIzaSy..." class="flex-grow p-2 border border-purple-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-600">
+                    <button onclick="saveApiKey()" class="bg-purple-900 text-white px-3 py-2 rounded-lg font-bold hover:bg-purple-800 transition">Conectar</button>
+                </div>
+                <p id="api-status-msg" class="text-green-700 font-medium mt-1 hidden">✓ Conectado correctamente con Gemini 2.5 Flash.</p>
+            </div>
+
+            <!-- Ventana de Conversación -->
+            <div id="chat-messages" class="flex-grow p-4 sm:p-6 overflow-y-auto space-y-4 chat-scrollbar bg-purple-50/10 max-h-[500px]">
+                
+                <!-- Mensaje de bienvenida inicial -->
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-purple-200 text-purple-950 flex items-center justify-center font-cursive font-bold shrink-0 shadow-sm border border-purple-300">cl</div>
+                    <div class="bg-white p-4 rounded-3xl rounded-tl-none shadow-sm border border-purple-100 max-w-[85%]">
+                        <p class="text-sm">¡Hola hermosa! 🌸 Bienvenida a la plataforma oficial de <strong class="font-cursive text-purple-900 text-base">coki lok</strong>. Soy tu planificadora y asesora virtual.</p>
+                        <p class="text-sm mt-2">¿Quieres ver nuestras **salas de eventos y salas de ventas reales**? He cargado fotos espectaculares de cada una. Solo haz clic en ellas para visualizarlas a tamaño completo, consultar su capacidad o reservar.</p>
+                        <p class="text-xs text-purple-700 font-bold mt-2">🌳 Sala Jardín Secreto (Con luces mágicas)<br>🏰 Sala Palacio Imperial (Lujo masivo de hasta 500 personas)<br>🌌 Sala Domo Estelar (Proyección láser y capacidad de hasta 800 personas)<br>🌊 Sala Mansión del Lago (Entorno clásico junto al agua)<br>🛍️ Sala de Ventas Boutique (Showroom moderno para marcas o exposiciones)</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Formulario de Entrada del Chat -->
+            <form id="chat-form" onsubmit="handleChatSubmit(event)" class="p-4 bg-white border-t border-purple-100 flex items-center space-x-2">
+                <input type="text" id="chat-input" placeholder="Escribe 'ver salas de eventos', 'palacio imperial' o 'sala de ventas'..." class="flex-grow p-3 sm:p-3.5 border border-purple-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm shadow-sm" required autocomplete="off">
+                <button type="submit" class="bg-purple-900 hover:bg-purple-855 text-white p-3.5 rounded-2xl transition flex items-center justify-center shadow-md shrink-0">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </button>
+            </form>
+
+        </section>
+
+    </main>
+
+    <!-- Sidebar Lateral de Cotizaciones Guardadas (Drawer) -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-[90vw] sm:w-[450px] bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col border-l border-purple-200">
+        <div class="bg-purple-900 text-white p-6 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                <h3 class="text-xl font-bold">Mis Salas Cotizadas</h3>
+            </div>
+            <button onclick="toggleCart()" class="p-2 hover:bg-purple-800 rounded-full transition">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- Lista de Cotizaciones -->
+        <div class="flex-grow overflow-y-auto p-6 space-y-4" id="cart-items-container">
+            <div class="text-center py-12 text-gray-500" id="empty-cart-msg">
+                <i data-lucide="heart" class="w-12 h-12 mx-auto mb-4 text-purple-300 animate-pulse"></i>
+                <p class="font-medium text-purple-950">¡Tu cotización está vacía!</p>
+                <p class="text-xs mt-1 text-gray-400">Selecciona salas de eventos en el catálogo del chat y agrégalas para estimar tu presupuesto de fiesta.</p>
+            </div>
+        </div>
+
+        <!-- Resumen de la Cotización -->
+        <div class="p-6 bg-purple-50 border-t border-purple-200 space-y-4">
+            <div class="flex justify-between items-center text-lg font-bold text-purple-950">
+                <span>Presupuesto Base:</span>
+                <span id="cart-total-amount">$0.00</span>
+            </div>
+            <div class="space-y-2">
+                <button onclick="checkoutOrder()" class="w-full bg-purple-900 hover:bg-purple-855 text-white py-3.5 rounded-full font-bold shadow-md transition text-center flex items-center justify-center space-x-2">
+                    <i data-lucide="check" class="w-5 h-5"></i>
+                    <span>Enviar Cotización a WhatsApp</span>
+                </button>
+                <button onclick="clearCart()" class="w-full text-purple-955 hover:text-purple-700 py-2 rounded-full text-xs font-semibold transition text-center">
+                    Limpiar Lista de Cotización
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE VISUALIZACIÓN COMPLETA (Zoom Modal de la Foto Real) -->
+    <div id="image-preview-modal" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl relative border-2 border-purple-300 transform scale-95 transition-transform duration-300 flex flex-col animate-fade-in" id="preview-modal-box">
+            <!-- Botón Cerrar -->
+            <button onclick="closeImageModal()" class="absolute top-4 right-4 p-2 bg-purple-900 hover:bg-purple-800 text-white rounded-full shadow-lg z-10 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <!-- Contenedor del Diseño/Foto de la sala ampliado -->
+            <div class="bg-purple-100 p-0 flex items-center justify-center min-h-[300px] max-h-[400px] relative overflow-hidden" id="modal-image-container">
+                <!-- Se inyecta aquí la foto real de la sala -->
+            </div>
+
+            <!-- Datos de la Sala de Eventos o de Ventas -->
+            <div class="p-6 space-y-3 bg-white">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span id="modal-brand-badge" class="text-[10px] font-extrabold px-3 py-1 rounded-full border bg-purple-200 text-purple-900 border-purple-300"></span>
+                        <h4 id="modal-item-title" class="text-2xl font-extrabold text-purple-950 mt-1 leading-tight"></h4>
+                    </div>
+                    <span id="modal-item-price" class="text-2xl font-black text-purple-900 shrink-0"></span>
+                </div>
+                
+                <p id="modal-item-description" class="text-sm text-gray-600 leading-relaxed"></p>
+                <p id="modal-item-capacity" class="text-xs text-purple-800 font-bold"></p>
+
+                <!-- Acciones directas -->
+                <div class="pt-4 flex gap-3" id="modal-action-container">
+                    <!-- Botón de agendar reserva de sala -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Reserva para Locales -->
+    <div id="booking-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-purple-200">
+            <button onclick="closeBookingModal()" class="absolute top-4 right-4 p-2 hover:bg-purple-100 rounded-full text-purple-950 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-2xl font-bold text-purple-950 mb-1" id="modal-book-title">Reservar Sala</h3>
+            <p class="text-sm text-gray-500 mb-6" id="modal-book-price"></p>
+
+            <form onsubmit="handleBookingSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-purple-950 mb-1 uppercase tracking-wide">Tu Nombre Completo</label>
+                    <input type="text" id="booking-name" required class="w-full p-2.5 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-purple-950 mb-1 uppercase tracking-wide">Teléfono de Contacto o WhatsApp</label>
+                    <input type="tel" id="booking-phone" required class="w-full p-2.5 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm" placeholder="Ej: +593 999 999 999">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-purple-950 mb-1 uppercase tracking-wide">Fecha Seleccionada</label>
+                        <input type="date" id="booking-date" required class="w-full p-2.5 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-purple-950 mb-1 uppercase tracking-wide">Tipo de Reunión</label>
+                        <select id="booking-type" class="w-full p-2.5 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 text-sm">
+                            <option>Fiesta de Cumpleaños 🎉</option>
+                            <option>Gala de Quinceañera 👸</option>
+                            <option>Reunión Escolar/Graduación 🎓</option>
+                            <option>Feria de Ventas / Showroom 🛍️</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-purple-900 hover:bg-purple-855 text-white font-bold py-3.5 rounded-full transition shadow-md mt-4">
+                    Confirmar mi Reserva de Fecha
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alertas personalizadas flotantes -->
+    <div id="toast-notification" class="fixed top-6 right-6 z-50 bg-purple-950 text-white px-5 py-4 rounded-2xl shadow-2xl border border-purple-800 transform translate-y-[-120px] opacity-0 transition-all duration-300 flex items-center space-x-3 max-w-sm">
+        <div id="toast-icon" class="bg-purple-800 text-purple-200 p-2 rounded-full">
+            <i data-lucide="info" class="w-5 h-5"></i>
+        </div>
+        <div>
+            <p id="toast-message" class="text-sm font-semibold"></p>
+        </div>
+    </div>
+
+    <!-- LOGIC SYSTEM (JavaScript) -->
+    <script>
+        // Diseños Vectoriales e Ilustraciones en SVG de las Salas (Sistemas de Respaldo por si falla la conexión)
+        const SALAS_SVGS = {
+            sala_jardin: `
+            <svg viewBox="0 0 120 120" class="w-full h-full">
+                <circle cx="25" cy="85" r="18" fill="#10b981" opacity="0.9" />
+                <circle cx="95" cy="85" r="18" fill="#10b981" opacity="0.9" />
+                <rect x="22" y="95" width="6" height="15" fill="#047857" />
+                <rect x="92" y="95" width="6" height="15" fill="#047857" />
+                <path d="M 5 35 Q 60 65 115 35" stroke="#059669" fill="none" stroke-width="2" />
+                <circle cx="60" cy="49" r="6" fill="#fef08a" />
+                <rect x="35" y="70" width="50" height="22" rx="4" fill="#ffffff" stroke="#059669" stroke-width="2" />
+                <text x="60" y="83" font-size="4.5" font-weight="bold" text-anchor="middle" fill="#059669">Bienvenidos</text>
+                <text x="60" y="20" font-size="6.5" font-weight="extrabold" text-anchor="middle" fill="#065f46">SALA JARDÍN MÍSTICO</text>
+            </svg>`,
+            
+            sala_imperial: `
+            <svg viewBox="0 0 120 120" class="w-full h-full">
+                <path d="M15 95 L105 95 L105 35 L90 20 L30 20 L15 35 Z" fill="#faf5ff" stroke="#6b21a8" stroke-width="2.5" />
+                <rect x="25" y="35" width="8" height="60" fill="#ffffff" stroke="#6b21a8" stroke-width="1" />
+                <rect x="87" y="35" width="8" height="60" fill="#ffffff" stroke="#6b21a8" stroke-width="1" />
+                <rect x="38" y="55" width="44" height="18" rx="2" fill="#ffffff" stroke="#6b21a8" stroke-width="1.5" />
+                <text x="60" y="66" font-size="4" font-weight="bold" text-anchor="middle" fill="#6b21a8">Gala Imperial</text>
+                <text x="60" y="112" font-size="6" font-weight="extrabold" text-anchor="middle" fill="#4a044e">SALA IMPERIAL</text>
+            </svg>`,
+            
+            sala_ventas: `
+            <svg viewBox="0 0 120 120" class="w-full h-full">
+                <line x1="15" y1="45" x2="105" y2="45" stroke="#4a044e" stroke-width="3" />
+                <path d="M 30 45 L 30 65 M 25 65 L 35 65" stroke="#c084fc" stroke-width="2" />
+                <path d="M 90 45 L 90 65 M 85 65 L 95 65" stroke="#c084fc" stroke-width="2" />
+                <rect x="35" y="75" width="50" height="20" rx="3" fill="#ffffff" stroke="#4a044e" stroke-width="2" />
+                <text x="60" y="87" font-size="4" font-weight="extrabold" text-anchor="middle" fill="#4a044e">Boutique Coki</text>
+                <text x="60" y="25" font-size="6.5" font-weight="extrabold" text-anchor="middle" fill="#4a044e">SALA DE VENTAS BOUTIQUE</text>
+            </svg>`,
+            
+            sala_domo: `
+            <svg viewBox="0 0 120 120" class="w-full h-full">
+                <path d="M10 95 C10 20, 110 20, 110 95 Z" fill="#eff6ff" stroke="#1d4ed8" stroke-width="3" />
+                <path d="M10 95 Q 60 45 110 95" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+                <circle cx="35" cy="45" r="2.5" fill="#fef08a" />
+                <circle cx="85" cy="45" r="2.5" fill="#fef08a" />
+                <text x="60" y="112" font-size="6" font-weight="extrabold" text-anchor="middle" fill="#1e40af">SALA DOMO ESTELAR</text>
+            </svg>`,
+            
+            sala_mansion: `
+            <svg viewBox="0 0 120 120" class="w-full h-full">
+                <rect x="25" y="25" width="70" height="55" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="2" />
+                <path d="M20 25 L60 5 L100 25 Z" fill="#bbf7d0" stroke="#16a34a" stroke-width="2" />
+                <path d="M 5 95 Q 30 90 55 95 Q 80 100 105 95 L 120 95" fill="none" stroke="#2563eb" stroke-width="2" />
+                <text x="60" y="55" font-size="5" font-weight="extrabold" text-anchor="middle" fill="#14532d">MANSIÓN LAGO</text>
+            </svg>`
+        };
+
+        // Base de Datos de Salas autorizadas con FOTOS REALES de alta calidad de Unsplash
+        const VENUES = [
+            {
+                id: 'v4',
+                name: 'Sala de Eventos Palacio Imperial',
+                price: 850,
+                description: 'Sala de banquetes majestuosa con iluminación real cálida, techos ornamentados y columnas de gran lujo. Diseñada exclusivamente para albergar bailes de gala de quinceañeras, bodas y banquetes masivos con total distinción.',
+                capacity: 'Hasta 500 personas (Capacidad Súper Gigante)',
+                imageUrl: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
+                backupSvg: SALAS_SVGS.sala_imperial
+            },
+            {
+                id: 'v5',
+                name: 'Sala Domo Estelar Masivo',
+                price: 990,
+                description: 'Una asombrosa sala con cúpula acústica equipada con iluminación inteligente láser de colores vibrantes y proyección digital. Es el espacio favorito de jóvenes y adolescentes para celebrar sus graduaciones bailando bajo las estrellas.',
+                capacity: 'Hasta 800 personas (Capacidad Suprema)',
+                imageUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=800',
+                backupSvg: SALAS_SVGS.sala_domo
+            },
+            {
+                id: 'v6',
+                name: 'Sala Mansión Lago Esmeralda',
+                price: 600,
+                description: 'Hermosa sala de recepción de estilo clásico con muelle de madera directamente junto a un lago cristalino. Rodeada de amplios jardines y flores, ideal para capturar las fotos reales más inolvidables de tu fiesta.',
+                capacity: 'Hasta 300 personas (Capacidad de Gala)',
+                imageUrl: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
+                backupSvg: SALAS_SVGS.sala_mansion
+            },
+            {
+                id: 'v1',
+                name: 'Sala de Eventos Jardín Secreto',
+                price: 250,
+                description: 'Santuario natural al aire libre cubierto por románticas guirnaldas de luces suspendidas entre frondosos árboles. Ofrece un ambiente íntimo y seguro para celebrar cumpleaños memorables bajo el cielo.',
+                capacity: 'Hasta 80 personas (Capacidad Íntima)',
+                imageUrl: 'https://images.unsplash.com/photo-1541123437800-1bb1317badc2?auto=format&fit=crop&q=80&w=800',
+                backupSvg: SALAS_SVGS.sala_jardin
+            },
+            {
+                id: 'v2',
+                name: 'Sala de Ventas y Exposición Boutique',
+                price: 150,
+                description: 'Elegante y moderna sala de exhibición minimalista con percheros dorados, espejos de cuerpo entero y probadores. Diseñada para realizar desfiles privados, showrooms de marcas o ferias de venta de moda boutique.',
+                capacity: 'Hasta 60 personas (Sala de Ventas Especial)',
+                imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=800',
+                backupSvg: SALAS_SVGS.sala_ventas
+            }
+        ];
+
+        // Estado Global del Sistema
+        let cart = [];
+        let isCartOpen = false;
+        let apiKey = localStorage.getItem('coki_gemini_key') || "";
+        let selectedVenue = null;
+
+        // Estado del Coki Planner (Interactividad izquierda)
+        let eventBaseRoom = 'v1';
+        let eventTheme = 'hadas';
+        let eventWelcomeText = 'Mis Dulces 15';
+
+        // Función controladora para fallos de carga de imágenes (Garantiza que nunca haya líneas rojas de error)
+        function handleImageError(imgElement, venueId) {
+            const venue = VENUES.find(v => v.id === venueId);
+            const parent = imgElement.parentElement;
+            if (parent && venue) {
+                // Reemplaza la imagen por la ilustración SVG limpia
+                parent.innerHTML = venue.backupSvg;
+            }
+        }
+
+        // Sistema "Coki Planner" (Interactividad izquierda)
+        function updateCustomEvent() {
+            const roomSelect = document.getElementById('event-room-select');
+            const themeSelect = document.getElementById('event-theme-select');
+            const welcomeInput = document.getElementById('event-welcome-text');
+
+            eventBaseRoom = roomSelect.value;
+            eventTheme = themeSelect.value;
+            eventWelcomeText = welcomeInput.value || 'Bienvenidos';
+
+            const selectedRoom = VENUES.find(v => v.id === eventBaseRoom);
+            if (!selectedRoom) return;
+
+            const selectedOption = themeSelect.options[themeSelect.selectedIndex];
+            const overlayColor = selectedOption.getAttribute('data-overlay');
+
+            document.getElementById('event-price-btn').textContent = `Agregar a mi Cotización ($${selectedRoom.price}.00)`;
+            
+            // Renderizar la previsualización de la sala con un filtro de luz temática real
+            document.getElementById('custom-event-preview').innerHTML = `
+                <div class="relative w-full h-full rounded-xl overflow-hidden">
+                    <img src="${selectedRoom.imageUrl}" alt="${selectedRoom.name}" onerror="handleImageError(this, '${selectedRoom.id}')" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 transition-colors duration-500" style="background-color: ${overlayColor}; mix-blend-mode: multiply;"></div>
+                    <div class="absolute bottom-2 inset-x-2 bg-white/90 backdrop-blur-xs p-1.5 rounded-lg text-center border border-purple-200">
+                        <p class="text-[8px] uppercase font-bold text-purple-950 tracking-wider truncate">${eventWelcomeText}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('custom-event-title').textContent = `${selectedRoom.name} - ${selectedOption.text.split(' ')[0]}`;
+        }
+
+        // Zoom al Evento Personalizado del Coki Planner
+        function zoomCustomEvent() {
+            const roomSelect = document.getElementById('event-room-select');
+            const themeSelect = document.getElementById('event-theme-select');
+            
+            const selectedRoom = VENUES.find(v => v.id === eventBaseRoom);
+            if (!selectedRoom) return;
+
+            const selectedThemeName = themeSelect.options[themeSelect.selectedIndex].text;
+            const overlayColor = themeSelect.options[themeSelect.selectedIndex].getAttribute('data-overlay');
+
+            const eventDetails = {
+                name: 'Decoración Temática Personalizada',
+                brand: 'Planificador Coki Lok 🪄',
+                brandClass: 'bg-purple-900 text-white border-purple-950',
+                price: `$${selectedRoom.price}.00`,
+                description: `Has diseñado una decoración espectacular en la **${selectedRoom.name}** bajo la temática **${selectedThemeName}**. El cartel principal de bienvenida exhibirá el texto: "${eventWelcomeText}".`,
+                htmlImage: `
+                    <div class="relative w-full h-[300px] flex items-center justify-center overflow-hidden rounded-t-3xl">
+                        <img src="${selectedRoom.imageUrl}" alt="${selectedRoom.name}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0" style="background-color: ${overlayColor}; mix-blend-mode: multiply;"></div>
+                        <div class="absolute bottom-4 inset-x-4 bg-white/95 p-3 rounded-xl text-center border border-purple-200 shadow-lg">
+                            <p class="text-xs uppercase font-extrabold text-purple-950 tracking-widest">${eventWelcomeText}</p>
+                        </div>
+                    </div>
+                `,
+                actionHtml: `
+                    <button onclick="addCustomEventToCart(); closeImageModal();" class="flex-grow bg-purple-900 hover:bg-purple-800 text-white font-bold py-3 rounded-full text-xs shadow transition flex items-center justify-center gap-2">
+                        <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                        <span>Agregar esta decoración a mi Cotización</span>
+                    </button>
+                `
+            };
+
+            openImageModal(eventDetails);
+        }
+
+        // Agregar cotización de diseño al carrito
+        function addCustomEventToCart() {
+            const roomSelect = document.getElementById('event-room-select');
+            const themeSelect = document.getElementById('event-theme-select');
+            
+            const selectedRoom = VENUES.find(v => v.id === eventBaseRoom);
+            if (!selectedRoom) return;
+
+            const selectedThemeName = themeSelect.options[themeSelect.selectedIndex].text;
+            const overlayColor = themeSelect.options[themeSelect.selectedIndex].getAttribute('data-overlay');
+
+            const customProduct = {
+                id: 'custom-event-' + Date.now(),
+                name: `Diseño Real: ${selectedRoom.name}`,
+                price: selectedRoom.price,
+                brand: `Temática: ${selectedThemeName}`,
+                brandColor: 'bg-purple-900 text-white border-purple-950',
+                description: `Cartel: "${eventWelcomeText}".`,
+                isCustom: true,
+                // Conservar estructura para renderizado en carrito
+                htmlImage: `
+                    <div class="relative w-full h-full rounded-md overflow-hidden">
+                        <img src="${selectedRoom.imageUrl}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0" style="background-color: ${overlayColor}; mix-blend-mode: multiply;"></div>
+                    </div>
+                `
+            };
+
+            cart.push({ ...customProduct, quantity: 1 });
+            updateCartUI();
+            showToast(`¡Tu cotización de sala real con temática se agregó a la lista! 🏰✨`, 'sparkles');
+        }
+
+        // SISTEMA DE MODAL PARA VER IMAGEN EN PANTALLA COMPLETA (Zoom Modal)
+        function openImageModal(details) {
+            const modal = document.getElementById('image-preview-modal');
+            const box = document.getElementById('preview-modal-box');
+            
+            document.getElementById('modal-image-container').innerHTML = details.htmlImage;
+            document.getElementById('modal-item-title').textContent = details.name;
+            document.getElementById('modal-item-price').textContent = details.price;
+            document.getElementById('modal-item-description').textContent = details.description;
+            
+            const badge = document.getElementById('modal-brand-badge');
+            badge.textContent = details.brand;
+            badge.className = `text-[10px] font-extrabold px-3 py-1 rounded-full border ${details.brandClass || 'bg-purple-100 text-purple-900 border-purple-200'}`;
+
+            const capacityP = document.getElementById('modal-item-capacity');
+            if (details.capacity) {
+                capacityP.textContent = `👥 Capacidad máxima recomendada: ${details.capacity}`;
+                capacityP.classList.remove('hidden');
+            } else {
+                capacityP.classList.add('hidden');
+            }
+
+            document.getElementById('modal-action-container').innerHTML = details.actionHtml;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('scale-95');
+            }, 50);
+            
+            lucide.createIcons();
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('image-preview-modal');
+            const box = document.getElementById('preview-modal-box');
+            
+            modal.classList.add('opacity-0');
+            box.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Trigger para ver imagen completa de Salas de Eventos del Catálogo
+        function viewFullVenue(id) {
+            const venue = VENUES.find(v => v.id === id);
+            if (!venue) return;
+
+            openImageModal({
+                name: venue.name,
+                brand: 'Sala de Eventos Real de Coki Lok 🏰',
+                brandClass: 'bg-purple-100 text-purple-900 border-purple-300',
+                price: `$${venue.price}.00`,
+                description: venue.description,
+                capacity: venue.capacity,
+                htmlImage: `
+                    <div class="relative w-full h-[320px] overflow-hidden rounded-t-3xl flex items-center justify-center">
+                        <img src="${venue.imageUrl}" alt="${venue.name}" onerror="handleImageError(this, '${venue.id}')" class="w-full h-full object-cover">
+                    </div>
+                `,
+                actionHtml: `
+                    <button onclick="addToCart('${venue.id}'); closeImageModal();" class="flex-grow bg-purple-900 hover:bg-purple-800 text-white font-bold py-3 rounded-full text-xs shadow transition flex items-center justify-center gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Añadir a mi Cotización</span>
+                    </button>
+                    <button onclick="openBookingModal('${venue.id}'); closeImageModal();" class="bg-purple-100 hover:bg-purple-200 text-purple-950 font-bold py-3 px-6 rounded-full text-xs transition">
+                        Apartar Fecha ahora
+                    </button>
+                `
+            });
+        }
+
+        // Enviar consulta rápida de botones
+        function sendQuickQuery(queryText) {
+            const input = document.getElementById('chat-input');
+            input.value = queryText;
+            document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+        }
+
+        // Manejar el submit del chat
+        function handleChatSubmit(event) {
+            event.preventDefault();
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            appendChatMessage('user', message);
+            input.value = '';
+
+            generateBotResponse(message);
+        }
+
+        // Insertar mensajes en el chat
+        function appendChatMessage(sender, text, htmlContent = '') {
+            const chatBox = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-3';
+            
+            const isBot = sender === 'bot';
+            
+            messageDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full ${isBot ? 'bg-purple-200 text-purple-950 font-cursive font-bold border border-purple-300' : 'bg-purple-900 text-white'} flex items-center justify-center text-xs shrink-0 shadow-sm">
+                    ${isBot ? 'cl' : 'Tú'}
+                </div>
+                <div class="${isBot ? 'bg-white text-gray-800 rounded-tl-none border-purple-100' : 'bg-purple-900 text-white rounded-tr-none border-transparent'} p-4 rounded-3xl shadow-sm border max-w-[90%] w-full">
+                    ${text ? `<p class="text-sm leading-relaxed">${text}</p>` : ''}
+                    ${htmlContent ? `<div class="mt-4">${htmlContent}</div>` : ''}
+                </div>
+            `;
+            
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Motor de Respuestas del Chatbot
+        async function generateBotResponse(userMessage) {
+            const chatBox = document.getElementById('chat-messages');
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'flex items-start space-x-3';
+            typingDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-purple-200 text-purple-955 font-cursive font-bold flex items-center justify-center text-xs shrink-0 border border-purple-300">cl</div>
+                <div class="bg-white text-gray-400 p-4 rounded-3xl rounded-tl-none shadow-sm border border-purple-100 max-w-[85%] text-xs italic flex items-center space-x-1">
+                    <span>Coki está preparando las fotografías de salas reales</span>
+                    <span class="animate-bounce delay-100">.</span>
+                    <span class="animate-bounce delay-200">.</span>
+                    <span class="animate-bounce delay-300">.</span>
+                </div>
+            `;
+            chatBox.appendChild(typingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            if (apiKey) {
+                try {
+                    const response = await fetchGeminiResponse(userMessage);
+                    removeTypingIndicator();
+                    const extraHtml = detectProductsAndRender(userMessage);
+                    appendChatMessage('bot', response, extraHtml);
+                } catch (e) {
+                    console.error(e);
+                    removeTypingIndicator();
+                    fallbackResponse(userMessage);
+                }
+            } else {
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    fallbackResponse(userMessage);
+                }, 1000);
+            }
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        // Renderizado del Catálogo de Salas Reales dentro de la conversación del Chat
+        function detectProductsAndRender(message) {
+            const msg = message.toLowerCase();
+            let venueMatches = [];
+
+            if (msg.includes('capacidad') || msg.includes('grande') || msg.includes('masivo') || msg.includes('persona') || msg.includes('personas') || msg.includes('800') || msg.includes('500') || msg.includes('300')) {
+                venueMatches = VENUES.filter(v => v.id === 'v4' || v.id === 'v5' || v.id === 'v6');
+            }
+            else if (msg.includes('ventas') || msg.includes('boutique') || msg.includes('exposicion') || msg.includes('showroom')) {
+                venueMatches = VENUES.filter(v => v.id === 'v2');
+            }
+            else if (msg.includes('jardin') || msg.includes('campestre') || msg.includes('secreto') || msg.includes('luces')) {
+                venueMatches = VENUES.filter(v => v.id === 'v1');
+            }
+            else if (msg.includes('sala') || msg.includes('salas') || msg.includes('evento') || msg.includes('eventos') || msg.includes('catalogo') || msg.includes('tienda') || msg.includes('alquiler') || msg.includes('reales') || msg.includes('real') || msg.includes('tienen')) {
+                venueMatches = VENUES;
+            }
+
+            if (venueMatches.length > 0) {
+                let html = `<p class="text-xs font-bold text-purple-900 mb-3 uppercase tracking-wide">📸 Fotografías de Salas Reales (Haz clic para abrir pantalla completa):</p>`;
+                html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">`;
+                venueMatches.forEach(venue => {
+                    html += `
+                        <div class="bg-white rounded-2xl overflow-hidden border border-purple-200 flex flex-col justify-between shadow-sm hover:border-purple-400 transition">
+                            <div onclick="viewFullVenue('${venue.id}')" class="relative h-40 flex items-center justify-center cursor-zoom-in group hover:opacity-95 transition overflow-hidden bg-purple-100">
+                                <img src="${venue.imageUrl}" alt="${venue.name}" onerror="handleImageError(this, '${venue.id}')" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <span class="absolute bottom-2 left-2 bg-purple-950 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">${venue.capacity}</span>
+                                <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                                    <span class="bg-white text-[9px] font-bold px-2 py-0.5 rounded shadow flex items-center gap-1">
+                                        <i data-lucide="zoom-in" class="w-3 h-3"></i> Abrir Grande
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-purple-50/40 border-t border-purple-100">
+                                <h4 class="font-bold text-purple-950 text-sm leading-tight">${venue.name}</h4>
+                                <p class="text-purple-900 font-extrabold text-sm mt-1">Precio base: $${venue.price}.00</p>
+                            </div>
+                            <div class="px-3 pb-3 bg-purple-50/40 flex gap-2">
+                                <button onclick="addToCart('${venue.id}')" class="flex-grow bg-purple-900 hover:bg-purple-855 text-white text-xs font-bold py-2 rounded-xl transition flex items-center justify-center gap-1">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                    <span>Cotizar</span>
+                                </button>
+                                <button onclick="viewFullVenue('${venue.id}')" class="bg-purple-100 hover:bg-purple-200 text-purple-900 p-2 rounded-xl transition" title="Ver completo">
+                                    <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                return html;
+            }
+
+            return '';
+        }
+
+        // Respuestas del Sistema de Emergencia Local (Sin API Key)
+        function fallbackResponse(userMessage) {
+            const msg = userMessage.toLowerCase();
+            let replyText = "";
+            let htmlContent = detectProductsAndRender(userMessage);
+
+            if (msg.includes('evento') || msg.includes('salas') || msg.includes('sala') || msg.includes('alquiler') || msg.includes('reserva') || msg.includes('real') || msg.includes('reales')) {
+                replyText = "¡Claro que sí! 🏰 En Coki Lok ofrecemos salas reales espectaculares. Aquí tienes el catálogo de fotografías reales. Puedes hacer clic en cualquiera para abrirla en pantalla completa, ver su capacidad o cotizar:";
+            } 
+            else if (msg.includes('capacidad') || msg.includes('grande') || msg.includes('masivo') || msg.includes('persona') || msg.includes('personas')) {
+                replyText = "👥 ¡Por supuesto! Contamos con amplias salas ideales para eventos masivos y seguros de hasta 800 personas (como la Sala Domo Estelar con luces de colores) o la Sala Palacio Imperial de 500 personas. Te dejo sus fotografías reales:";
+            }
+            else if (msg.includes('ventas') || msg.includes('boutique') || msg.includes('exposicion') || msg.includes('showroom')) {
+                replyText = "🛍️ Nuestra Sala de Ventas Boutique es un espacio súper elegante diseñado con percheros modernos y probadores, ideal para hacer showrooms o exposiciones. Aquí tienes su foto real:";
+            }
+            else if (msg.includes('hola') || msg.includes('buenos dias') || msg.includes('buenas tardes') || msg.includes('saludos')) {
+                replyText = "¡Hola hermosa! 😊 Qué alegría recibirte en Coki Lok. Soy tu asesora virtual de Coki Lok. Nos dedicamos de manera exclusiva al alquiler de salas de eventos y ventas con fotografías reales. ¿Cuál te gustaría ver grande hoy?";
+            }
+            else {
+                replyText = "🌸 ¡Con mucho gusto! Recuerda que en Coki Lok contamos con hermosas salas reales de eventos y de ventas boutique. ¿Cuál de ellas te gustaría conocer a pantalla completa hoy?";
+                htmlContent = detectProductsAndRender("sala");
+            }
+
+            appendChatMessage('bot', replyText, htmlContent);
+        }
+
+        // Conexión real con Gemini 2.5 Flash
+        async function fetchGeminiResponse(userQuery) {
+            const systemPrompt = `Eres Coki, la asesora de servicio al cliente virtual oficial de 'Coki Lok' (nuestro logo es de letras moradas oscuras en manuscrita y fondo morado claro). Tu tono es muy amable, juvenil, dulce, atento y sumamente respetuoso. Atiendes de manera segura a jóvenes de menos de 18 años y coordinas reservas para eventos escolares, cumpleaños y galas.
+
+            INFORMACIÓN CLAVE DE NUESTRO NEGOCIO:
+            1. No vendemos ropa, zapatos, accesorios ni fragancias corporales. Nos dedicamos al 100% al alquiler de salas.
+            2. Ofrecemos las siguientes salas reales:
+               - Sala de Eventos Jardín Secreto ($250.00 base, capacidad hasta 80 personas, estilo campestre con luces reales).
+               - Sala de Eventos Palacio Imperial ($850.00 base, capacidad hasta 500 personas, con cúpulas y columnas majestuosas).
+               - Sala Domo Estelar Masivo ($990.00 base, capacidad hasta 800 personas, ideal para grandes fiestas y proyecciones de luces).
+               - Sala Mansión del Lago ($600.00 base, capacidad hasta 300 personas, muelle privado al lago cristalino).
+               - Sala de Ventas y Exposición Boutique ($150.00 base, capacidad de 60 personas, probadores y áreas de percheros).
+
+            Instrucciones para tus respuestas:
+            - Sé muy dulce y atenta. Explica de forma amigable que el catálogo de salas reales se inyectará automáticamente debajo de tu respuesta.
+            - Invita al cliente a hacer clic en cualquier sala del catálogo del chat para verla ampliada en pantalla completa con opciones de reserva rápida de fecha.
+            - Mantén tus respuestas cortas (1-2 párrafos).
+            - Usa emojis como 🌸, 🏰, 👥, y ✨.`;
+
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: userQuery }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error("API call error");
+                    
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "¡Hola hermosa! Aquí tienes el catálogo solicitado:";
+                } catch (err) {
+                    if (i === 4) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // Bolsa/Carrito de cotizaciones funcional
+        function addToCart(venueId) {
+            const venue = VENUES.find(v => v.id === venueId);
+            if (!venue) return;
+
+            const existingItem = cart.find(item => item.id === venueId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...venue, quantity: 1 });
+            }
+
+            updateCartUI();
+            showToast(`¡${venue.name} agregada a tus cotizaciones! 🏰✨`, 'calendar-check');
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function updateCartQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (!item) return;
+
+            item.quantity += change;
+            if (item.quantity <= 0) {
+                removeFromCart(productId);
+            } else {
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const countBadge = document.getElementById('cart-count');
+            const totalSpan = document.getElementById('cart-total-amount');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+
+            container.innerHTML = '';
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (totalItems > 0) {
+                countBadge.textContent = totalItems;
+                countBadge.classList.remove('hidden');
+                if (emptyMsg) emptyMsg.classList.add('hidden');
+            } else {
+                countBadge.classList.add('hidden');
+                container.appendChild(emptyMsg);
+                emptyMsg.classList.remove('hidden');
+            }
+
+            let subtotal = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-center justify-between p-3 bg-purple-50 rounded-2xl border border-purple-100 space-x-3';
+                
+                // Mostrar imagen o diseño personalizado
+                let imageBlock = '';
+                if (item.isCustom) {
+                    imageBlock = `<div class="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-purple-200">${item.htmlImage}</div>`;
+                } else {
+                    imageBlock = `
+                    <div class="w-12 h-12 bg-white rounded-xl overflow-hidden shrink-0 border border-purple-200">
+                        <img src="${item.imageUrl}" alt="${item.name}" onerror="handleImageError(this, '${item.id}')" class="w-full h-full object-cover">
+                    </div>`;
+                }
+
+                itemDiv.innerHTML = `
+                    ${imageBlock}
+                    <div class="flex-grow min-w-0">
+                        <h4 class="font-bold text-purple-950 text-xs truncate">${item.name}</h4>
+                        <p class="text-[10px] text-gray-500 font-semibold">${item.brand || 'Sala Real'}</p>
+                        <p class="text-xs text-purple-900 font-bold">$${item.price.toFixed(2)}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="flex items-center bg-white rounded-lg border border-purple-200">
+                            <button onclick="updateCartQuantity('${item.id}', -1)" class="px-2 py-0.5 text-purple-900 font-bold hover:bg-purple-100 rounded-l-lg text-xs">-</button>
+                            <span class="px-1.5 text-xs font-bold">${item.quantity}</span>
+                            <button onclick="updateCartQuantity('${item.id}', 1)" class="px-2 py-0.5 text-purple-900 font-bold hover:bg-purple-100 rounded-r-lg text-xs">+</button>
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" class="text-red-500 hover:text-red-700 p-1">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+
+            totalSpan.textContent = `$${subtotal.toFixed(2)}`;
+            lucide.createIcons();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+            showToast('Tu lista de cotizaciones ha sido vaciada.', 'info');
+        }
+
+        function checkoutOrder() {
+            if (cart.length === 0) {
+                showToast('No has cotizado ningún espacio aún.', 'alert-triangle');
+                return;
+            }
+            showToast('🛒 ¡Cotización enviada a la central de Coki Lok! Nos comunicaremos contigo para agendar tu visita presencial.', 'check');
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+
+        // Toggle del Carrito
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            isCartOpen = !isCartOpen;
+            if (isCartOpen) {
+                sidebar.classList.remove('translate-x-full');
+            } else {
+                sidebar.classList.add('translate-x-full');
+            }
+        }
+
+        // Ajustes de API Key de Gemini
+        function toggleApiSettings() {
+            const panel = document.getElementById('api-settings-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function saveApiKey() {
+            const input = document.getElementById('api-key-input').value.trim();
+            apiKey = input;
+            localStorage.setItem('coki_gemini_key', input);
+            const statusMsg = document.getElementById('api-status-msg');
+            statusMsg.classList.remove('hidden');
+            setTimeout(() => {
+                statusMsg.classList.add('hidden');
+                toggleApiSettings();
+            }, 1500);
+        }
+
+        // Notificaciones Flotantes
+        function showToast(message, iconName = 'info') {
+            const toast = document.getElementById('toast-notification');
+            const text = document.getElementById('toast-message');
+            const iconContainer = document.getElementById('toast-icon');
+
+            text.textContent = message;
+            iconContainer.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i>`;
+            lucide.createIcons();
+
+            toast.classList.remove('translate-y-[-120px]', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-120px]', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 4000);
+        }
+
+        // Modales de Reserva para Locales
+        function openBookingModal(venueId) {
+            selectedVenue = VENUES.find(v => v.id === venueId);
+            if (!selectedVenue) return;
+
+            document.getElementById('modal-book-title').textContent = `Reservar ${selectedVenue.name}`;
+            document.getElementById('modal-book-price').textContent = `Precio de alquiler base estimado: $${selectedVenue.price}.00`;
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+            selectedVenue = null;
+        }
+
+        function handleBookingSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('booking-name').value;
+            const date = document.getElementById('booking-date').value;
+            showToast(`🏰 ¡Éxito! Pre-reserva registrada para la ${selectedVenue.name} para el ${date}. ¡Nos comunicaremos contigo, ${name}!`, 'party-popper');
+            closeBookingModal();
+        }
+    </script>
+</body>
+</html>
